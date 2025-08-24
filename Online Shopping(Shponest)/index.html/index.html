@@ -1,0 +1,628 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Website</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+    }
+    header {
+      background: #4CAF50;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    nav {
+      background: #333;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .menu {
+      display: flex;
+      gap: 10px;
+    }
+    nav button {
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      background: none;
+      color: white;
+    }
+    nav button:hover {
+      background: #4CAF50;
+      color: white;
+    }
+
+    /* Profile Dropdown */
+    .profile {
+      position: relative;
+      display: inline-block;
+    }
+    .profile button {
+      background: none;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .profile-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      background: white;
+      min-width: 150px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      border-radius: 5px;
+      z-index: 1;
+    }
+    .profile-menu a {
+      display: block;
+      padding: 10px;
+      text-decoration: none;
+      color: black;
+    }
+    .profile-menu a:hover {
+      background: #f2f2f2;
+    }
+    .profile:hover .profile-menu {
+      display: block;
+    }
+
+    .page { display: none; padding: 20px; }
+    .active { display: block; }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .product {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .product img { width: 100px; height: 100px; object-fit: cover; }
+    .cart, .bill {
+      margin-top: 20px;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .hidden { display: none; }
+    .success {
+      color: green;
+      font-size: 18px;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .cart button {
+      margin-left: 10px;
+      padding: 2px 6px;
+      border: none;
+      background: red;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .cart button:hover { background: darkred; }
+
+    /* Slider */
+    .slider {
+      width: 80%;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .slides {
+      display: flex;
+      width: 80%;
+      animation: slide 28s infinite;
+    }
+    .slides img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+    }
+    @keyframes slide {
+      0% { transform: translateX(0%); }
+      0% { transform: translateX(0%); }
+      5% { transform: translateX(0%); }
+      45% { transform: translateX(-100%); }
+      50% { transform: translateX(-200%); }
+      70% { transform: translateX(-200%); }
+      75% { transform: translateX(-300%); }
+      95% { transform: translateX(-300%); }
+      100% { transform: translateX(0%); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+  <img src="data:image/png;base64,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" 
+       alt="Store Logo" 
+       style="height:40px; margin-bottom:20px;">
+  <h1>🛒 My Shopping Store</h1>
+</header>
+  <nav>
+    <!-- Left Menu -->
+    <div class="menu">
+      <button onclick="showPage('home')">Home</button>
+      <button onclick="showPage('shop')">Start Shopping</button>
+      <button onclick="showPage('bill')">View Bill</button>
+    </div>
+
+    <!-- Right Profile Dropdown -->
+    <div class="profile">
+      <button>👤 Pulluri ▼</button>
+      <div class="profile-menu">
+        <a href="#">My Account</a>
+        <a href="#" onclick="showPage('past-bills')">Past Bills</a>
+        <a href="#">Orders</a>
+        <a href="#">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Top Search Bar -->
+  <div style="text-align:center; padding:10px; background-color:#f2f2f2;">
+    <input type="text" id="searchBar" placeholder="Search products..." style="width:50%; padding:8px; border-radius:5px; border:1px solid gray;">
+  </div>
+
+  <script>
+    function searchProducts() {
+      let input = document.getElementById("searchBar").value.toLowerCase();
+      let items = document.getElementsByClassName("product");
+      for (let i = 0; i < items.length; i++) {
+        let name = items[i].getElementsByTagName("h3")[0].innerText.toLowerCase();
+        if (name.includes(input)) {
+          items[i].style.display = "";
+        } else {
+          items[i].style.display = "none";
+        }
+      }
+    }
+    document.getElementById("searchBar").addEventListener("keyup", searchProducts);
+  </script>
+
+  <!-- Home Page -->
+  <div id="home" class="page active">
+    <h2>Welcome to the Store!</h2>
+    <p>Click Start Shopping to explore our products.</p>
+    <!-- Slider -->
+    <div class="slider">
+      <div class="slides">
+        <img src="images/bfruits/apples.jpeg" alt="Apple">
+        <img src="images/frits/watemelon.jpeg" alt="Apple">
+        <img src="images/fruits/mangoes.jpeg" alt="Mango">
+        <img src="images/fruits/milk.jpeg" alt="Milk">
+      </div>
+    </div>
+  </div>
+  <!-- Shopping Page -->
+  <div id="shop" class="page">
+    <h2>Fruits</h2>
+    <div class="products">
+      <div class="product">
+        <img src="images/fruits/apples.jpeg" alt="Apple">
+        <h3>Apple</h3>
+        <p>₹50 Per Kg</p>
+        <button onclick="addToCart('Apple', 50)">Add to Cart</button>
+      </div>
+      <div class="product">
+        <img src="images/fruits/mangoes.jpeg" alt="Mango">
+        <h3>Mango</h3>
+        <p>₹60 per Kg</p>
+        <button onclick="addToCart('Mango', 60)">Add to Cart</button>
+      </div>
+      <div class="product">
+        <img src="images/fruits/watemelon.jpeg" alt="Watermelon">
+        <h3>Watermelon</h3>
+        <p>₹50 per Kg</p>
+        <button onclick="addToCart('Watermelon', 80)">Add to Cart</button>
+      </div>
+      <div class="product">
+        <img src="images/fruits/oranges.jpeg" alt="orange">
+        <h3>Oranges</h3>
+        <p>₹40 per kg</p>
+        <button onclick="addToCart('Watermelon', 80)">Add to Cart</button>
+      </div><div class="product">
+        <img src="images/fruits/straberry.jpeg" alt="">
+        <h3>straberry</h3>
+        <p>₹100 per Kg</p>
+        <button onclick="addToCart('Straberry', 100)">Add to Cart</button>
+      </div>
+      <div class="product">
+        <img src="images/fruits/pineapple.jpeg" alt="Pineapple">
+        <h3>Pineapple</h3>
+        <p>₹40(for each)</p>
+        <button onclick="addToCart('Pineapple', 40)">Add to Cart</button>
+      </div>
+    </div>
+    <h2>Vegitables</h2>
+    <div class="products">
+      <div class="product">
+        <img src="images/vegitables/tomato.jpeg" alt="Tomato">
+        <h3>Tomato</h3>
+        <p>₹50 Per Kg</p>
+        <button onclick="addToCart('Tomato', 50)">Add to Cart</button>
+      </div>
+      <div class="product">
+        <img src="images/vegitables/brinjal.jpeg" alt="Brinjal">
+        <h3>Brinjal</h3>
+        <p>₹60 per Kg</p>
+        <button onclick="addToCart('Brinjal', 60)">Add to Cart</button>
+      </div>
+      <div class="product">
+        <img src="images/vegitables/carrot.jpeg" alt="Carrat">
+        <h3>Carrat</h3>
+        <p>₹60 per Kg</p>
+        <button onclick="addToCart('Carrat', 60)">Add to Cart</button>
+      </div>
+      <div class="product">
+        <img src="images/vegitables/ladysfinger.jpeg" alt="Ladysfinger">
+        <h3>Ladysfinger</h3>
+        <p>₹40 per Kg</p>
+        <button onclick="addToCart('Ladysfinger', 40)">Add to Cart</button>
+      </div>
+       <div class="product">
+        <img src="images/vegitables/pallak.jpg"alt="Palak">
+        <h3>Palak</h3>
+        <p>₹40 par kg</p>
+        <button onclick="addToCart('palak', 40)">Add to Cart</button>
+      </div>
+       <div class="product">
+        <img src="images/vegitables/potatoes.jpeg" alt="potato">
+        <h3>Potato</h3>
+        <p>₹40 per Kg</p>
+        <button onclick="addToCart('patoto', 40)">Add to Cart</button>
+      </div>
+    </div>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grocery Shop</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 {
+      margin-top: 20px;
+    }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .product {
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .product img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    select {
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dropdown -->
+  <label for="category">Choose Category: </label>
+  <select id="category" onchange="showCategory()">
+    <option value="home">Home Groceries</option>
+    <option value="pickles">Pickles</option>
+    <option value="millets">Millets</option>
+    <option value="grains">Grains</option>
+    <option value="homeNeeds">Home Needs</option>
+  </select>
+
+  <!-- Title -->
+  <h2 id="categoryTitle">Home Groceries Products</h2>
+
+  <!-- Products Section -->
+  <div id="productsContainer" class="products"></div>
+
+  <script>
+    function addToCart(item, price) {
+      alert(item + " added to cart! Price: ₹" + price);
+    }
+
+    function showCategory() {
+      const category = document.getElementById("category").value;
+      const title = document.getElementById("categoryTitle");
+      const container = document.getElementById("productsContainer");
+
+      // Home Groceries
+      if (category === "home") {
+        title.textContent = "Home Groceries Products";
+        container.innerHTML = `
+          <div class="product">
+            <img src="images/othersg/mixed.jpeg" alt="Dryfruits">
+            <h3>Dryfruits</h3>
+            <p>₹600 per kg</p>
+            <button onclick="addToCart('Dryfruits', 600)">Add to Cart</button>
+          </div>
+          <div class="product">
+            <img src="images/othersg/mpickel.jpeg" alt="Mango Pickle">
+            <h3>Mango Pickle</h3>
+            <p>₹100 per 1/2 kg</p>
+            <button onclick="addToCart('Mango Pickle', 100)">Add to Cart</button>
+          </div>
+        `;
+      }
+
+      // Pickles
+      else if (category === "pickles") {
+        title.textContent = "Pickles";
+        container.innerHTML = `
+          <div class="product">
+            <img src="images/othersg/mpickel.jpeg" alt="Mango Pickle">
+            <h3>Mango Pickle</h3>
+            <p>₹100 per 1/2 kg</p>
+            <button onclick="addToCart('Mango Pickle', 100)">Add to Cart</button>
+          </div>
+          <div class="product">
+            <img src="images/othersg/npickel.jpeg" alt="Lemon Pickle">
+            <h3>Lemon Pickle</h3>
+            <p>₹120 per 1/2 kg</p>
+            <button onclick="addToCart('Lemon Pickle', 120)">Add to Cart</button>
+          </div>
+        `;
+      }
+
+      // Millets
+      else if (category === "millets") {
+        title.textContent = "Millets";
+        container.innerHTML = `
+          <div class="product">
+            <img src="images/othersg/millats.jpeg" alt="Foxtail Millet">
+            <h3>Foxtail Millet</h3>
+            <p>₹200 per kg</p>
+            <button onclick="addToCart('Foxtail Millet', 200)">Add to Cart</button>
+          </div>
+          <div class="product">
+            <img src="images/othersg/millats.jpeg" alt="Kodo Millet">
+            <h3>Kodo Millet</h3>
+            <p>₹180 per kg</p>
+            <button onclick="addToCart('Kodo Millet', 180)">Add to Cart</button>
+          </div>
+        `;
+      }
+
+      // Grains
+      else if (category === "grains") {
+        title.textContent = "Grains";
+        container.innerHTML = `
+          <div class="product">
+            <img src="images/othersg/rice.jpeg" alt="Rice">
+            <h3>Rice</h3>
+            <p>₹50 per kg</p>
+            <button onclick="addToCart('Rice', 50)">Add to Cart</button>
+          </div>
+          <div class="product">
+            <img src="images/othersg/pappulu.jpeg" alt="Pappulu">
+            <h3>Grains</h3>
+            <p>₹20 per 1/2 kg</p>
+            <button onclick="addToCart('Grains', 20)">Add to Cart</button>
+          </div>
+        `;
+      }
+
+      // Home Needs
+      else if (category === "homeNeeds") {
+        title.textContent = "Home Needs";
+        container.innerHTML = `
+          <div class="product">
+            <img src="images/othersg/oil.jpeg" alt="Cooking Oil">
+            <h3>Cooking Oil</h3>
+            <p>₹150 per liter</p>
+            <button onclick="addToCart('Cooking Oil', 150)">Add to Cart</button>
+          </div>
+          <div class="product">
+            <img src="images/othersg/salt.jpeg" alt="Salt">
+            <h3>Salt</h3>
+            <p>₹20 per packet</p>
+            <button onclick="addToCart('Salt', 20)">Add to Cart</button>
+          </div>
+          <div class="product">
+            <img src="images/othersg/sugar.jpeg" alt="Sugar">
+            <h3>Sugar</h3>
+            <p>₹40 per kg</p>
+            <button onclick="addToCart('Sugar', 40)">Add to Cart</button>
+          </div>
+        `;
+      }
+    }
+
+    // Show default on load
+    window.onload = showCategory;
+  </script>
+
+</body>
+</html>
+
+    <div class="cart">
+      <h3>🛒 Shopping Cart</h3>
+      <ul id="cart-list"></ul>
+      <h3>Total: ₹<span id="total">0</span></h3>
+      <label><input type="radio" name="payment" value="Online" onclick="showPayButton()"> Online</label>
+      <label><input type="radio" name="payment" value="Offline" onclick="showPayButton()"> Offline</label>
+      <div id="pay-section" class="hidden">
+        <button onclick="openBill()">Pay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bill Page -->
+  <div id="bill" class="page">
+    <h2>🧾 Bill Slip</h2>
+    <div id="bill-content"></div>
+    <div id="final-pay" class="hidden">
+      <button onclick="paymentSuccess()">Paid</button>
+    </div>
+    <p id="success-message" class="success hidden">✅ Payment Successful! Thank you.</p>
+  </div>
+
+  <!-- Past Bills Page -->
+  <div id="past-bills" class="page">
+    <h2>📜 Past Bills</h2>
+    <div id="past-bills-list">No past bills yet.</div>
+  </div>
+
+  <script>
+    let cart = [];
+    let total = 0;
+    let pastBills = JSON.parse(localStorage.getItem("pastBills")) || [];
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+
+      if (pageId === 'past-bills') {
+        renderPastBills();
+      }
+    }
+
+    function addToCart(name, price) {
+      let existing = cart.find(item => item.name === name);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({name, price, qty: 1});
+      }
+      total += price;
+      updateCart();
+    }
+
+    function removeFromCart(name, price) {
+      let item = cart.find(i => i.name === name);
+      if (item) {
+        item.qty -= 1;
+        total -= price;
+        if (item.qty <= 0) {
+          cart = cart.filter(i => i.name !== name);
+        }
+      }
+      updateCart();
+    }
+
+    function updateCart() {
+      let cartList = document.getElementById("cart-list");
+      cartList.innerHTML = "";
+      cart.forEach((item) => {
+        let li = document.createElement("li");
+        li.textContent = `${item.name} x${item.qty} - ₹${item.price * item.qty}`;
+        let btn = document.createElement("button");
+        btn.textContent = "-";
+        btn.onclick = () => removeFromCart(item.name, item.price);
+        li.appendChild(btn);
+        cartList.appendChild(li);
+      });
+      document.getElementById("total").textContent = total;
+    }
+
+    function showPayButton() {
+      document.getElementById("pay-section").classList.remove("hidden");
+    }
+
+    function openBill() {
+      showPage('bill');
+      let billContent = document.getElementById("bill-content");
+      billContent.innerHTML = "<h3>Items Purchased:</h3>";
+      cart.forEach(item => {
+        billContent.innerHTML += `<p>${item.name} x${item.qty} - ₹${item.price * item.qty}</p>`;
+      });
+      billContent.innerHTML += `<h3>Total: ₹${total}</h3>`;
+
+      document.getElementById("success-message").classList.add("hidden"); // reset success each time
+      document.getElementById("final-pay").classList.remove("hidden");
+    }
+
+    function paymentSuccess() {
+      document.getElementById("success-message").classList.remove("hidden");
+
+      // ✅ Save bill ONLY when Paid is clicked
+      if (cart.length > 0) {
+        let bill = {
+          items: [...cart],
+          total: total,
+          date: new Date().toLocaleString()
+        };
+        pastBills.push(bill);
+        localStorage.setItem("pastBills", JSON.stringify(pastBills));
+      }
+
+      // Reset cart
+      cart = [];
+      total = 0;
+      updateCart();
+    }
+
+    function renderPastBills() {
+      let container = document.getElementById("past-bills-list");
+      if (pastBills.length === 0) {
+        container.innerHTML = "No past bills yet.";
+        return;
+      }
+      container.innerHTML = "";
+      pastBills.forEach((bill, index) => {
+        let div = document.createElement("div");
+        div.style.border = "1px solid #ccc";
+        div.style.margin = "10px 0";
+        div.style.padding = "10px";
+        div.style.borderRadius = "5px";
+        div.innerHTML = `<h4>Bill #${index+1} - ${bill.date}</h4>`;
+        bill.items.forEach(i => {
+          div.innerHTML += `<p>${i.name} x${i.qty} - ₹${i.price * i.qty}</p>`;
+        });
+        div.innerHTML += `<strong>Total: ₹${bill.total}</strong>`;
+        container.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
